@@ -23,12 +23,50 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 interface LogItem {
-  // Define the structure of your log items here
   id: string;
+  created_time: string;
+  last_edited_time: string;
+  // ... other properties like 'created_by', 'last_edited_by', etc. if needed
+
   properties: {
-    [key: string]: any; // Replace 'any' with a more specific type as needed
+    "Log Date": {
+      date: {
+        start: string;
+        end: string | null;
+      };
+    };
+    "Done This Week": {
+      rich_text: Array<{
+        plain_text: string;
+        // Add other properties from rich_text if needed
+      }>;
+    };
+    Blockers: {
+      rich_text: Array<{
+        plain_text: string;
+        // Add other properties from rich_text if needed
+      }>;
+    };
+    Person: {
+      select: {
+        name: string;
+        color: string;
+      };
+    };
+    Project: {
+      select: {
+        name: string;
+        color: string;
+      };
+    };
+    "To-Do Next Week": {
+      rich_text: Array<{
+        plain_text: string;
+        // Add other properties from rich_text if needed
+      }>;
+    };
   };
-  // ... other properties
+  // Add other properties as needed
 }
 
 async function getData() {
@@ -98,7 +136,11 @@ export default function Home() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p>{item.properties["Done This Week"].rich_text[0].plain_text}</p>
+              <p>
+                {item.properties["Done This Week"].rich_text
+                  .map((text) => text.plain_text)
+                  .join(" ")}
+              </p>
             </CardContent>
             <CardFooter>
               <p>Project: {item.properties["Project"].select.name}</p>
