@@ -1,3 +1,6 @@
+"use client";
+import React, { useEffect, useState } from "react";
+
 import {
   Select,
   SelectContent,
@@ -6,11 +9,47 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
 
 import { Label } from "@/components/ui/label";
 
+interface LogItem {
+  // Define the structure of your log items here
+  id: string;
+  properties: {
+    [key: string]: any; // Replace 'any' with a more specific type as needed
+  };
+  // ... other properties
+}
+
+async function getData() {
+  const response = await fetch("/api/notion");
+  const data = await response.json();
+  return data;
+}
+
 export default function Home() {
+  const [logsData, setLogsData] = useState<LogItem[]>([]);
+
+  useEffect(() => {
+    getData().then((data) => {
+      setLogsData(data.results || []);
+    });
+  }, []);
+
+  if (!logsData) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <main>
       <div className="flex gap-4 flex-row items-end w-1/2">
@@ -49,7 +88,24 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-8"> </div>
+      <div className="grid grid-cols-3 gap-8 mt-12">
+        {logsData.map((item: LogItem) => (
+          <Card key={item.id}>
+            <CardHeader>
+              <CardTitle>{item.properties["Person"].select.name}</CardTitle>
+              <CardDescription>
+                Date: {item.properties["Log Date"].date.start}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>{item.properties["Done This Week"].rich_text[0].plain_text}</p>
+            </CardContent>
+            <CardFooter>
+              <p>Project: {item.properties["Project"].select.name}</p>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
     </main>
   );
 }
