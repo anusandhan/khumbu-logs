@@ -18,7 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { Checkbox } from "@/components/ui/checkbox";
+// import { Checkbox } from "@/components/ui/checkbox";
 
 import {
   HoverCard,
@@ -153,6 +153,58 @@ export default function Home() {
     fetchData(selectedProject, value, selectedPerson);
   };
 
+  const handleGenerateSummary = async () => {
+    const sortedLogs = [...logsData].sort((a, b) => {
+      const dateA = new Date(a.properties["Log Date"].date.start);
+      const dateB = new Date(b.properties["Log Date"].date.start);
+
+      if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+        return dateA.getTime() - dateB.getTime();
+      } else {
+        return 0;
+      }
+    });
+
+    const summary = {
+      selectedProject,
+      selectedPerson,
+      selectedDateRange,
+      logs: sortedLogs.map((log) => ({
+        date: log.properties["Log Date"].date.start,
+        doneThisWeek: log.properties["Done This Week"].rich_text
+          .map((text) => text.plain_text)
+          .join(" "),
+        toDoNextWeek: log.properties["To-Do Next Week"].rich_text
+          .map((text) => text.plain_text)
+          .join(" "),
+        blockers: log.properties["Blockers"].rich_text
+          .map((text) => text.plain_text)
+          .join(" "),
+      })),
+    };
+
+    console.log(summary);
+
+    try {
+      const response = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ summary }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data); // Handle the response from OpenAI
+    } catch (error) {
+      console.error("Error fetching summary:", error);
+    }
+  };
+
   if (!logsData) {
     return <p>Loading...</p>;
   }
@@ -218,7 +270,7 @@ export default function Home() {
         </div>
 
         <div className="basis-1/4 ml-4">
-          <Button className="btn-glow">
+          <Button onClick={handleGenerateSummary} className="btn-glow">
             <Sparkles className="mr-2 h-4 w-4" /> Generate Summary
           </Button>
         </div>
@@ -315,7 +367,7 @@ export default function Home() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between items-center">
-                <div className="flex items-center space-x-2">
+                {/* <div className="flex items-center space-x-2">
                   <Checkbox id="select-log" />
                   <label
                     htmlFor="select-log"
@@ -323,7 +375,7 @@ export default function Home() {
                   >
                     Select
                   </label>
-                </div>
+                </div> */}
                 <p className="text-sm text-muted-foreground">
                   {item.properties["Log Date"].date.start}
                 </p>

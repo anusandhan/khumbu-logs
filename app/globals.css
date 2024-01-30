@@ -72,7 +72,7 @@
   .btn-glow::before {
     content: "";
     position: absolute;
-    inset: -0.25px; /* spread control */
+    inset: -0.5px; /* spread control */
     transform: translate(0px, 1px); /* offset control*/
     z-index: -1;
     background: conic-gradient(
@@ -84,7 +84,12 @@
       rgb(54, 103, 196) 301.88deg,
       rgb(105, 30, 255) 360deg
     );
-    filter: blur(8px); /* control the blur */
+    filter: blur(4px); /* control the blur */
+    transition: filter 0.3s ease;
+  }
+
+  .btn-glow:hover::before {
+    filter: blur(8px);
   }
 }
 
