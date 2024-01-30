@@ -30,9 +30,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { Separator } from "@/components/ui/separator";
+
 import { Label } from "@/components/ui/label";
 
-import { Snowflake, RocketIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+import { Snowflake, Sparkles } from "lucide-react";
 
 interface LogItem {
   id: string;
@@ -84,20 +88,42 @@ interface LogItem {
 export default function Home() {
   const [logsData, setLogsData] = useState<LogItem[]>([]);
   const [selectedProject, setSelectedProject] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState<string>("");
   const [selectedDateRange, setSelectedDateRange] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [projects, setProjects] = useState([]);
+  const [persons, setPersons] = useState([]);
 
   useEffect(() => {
     console.log("Current logsData:", logsData);
   }, [logsData]);
 
-  async function fetchData(project: string, dateRange: string) {
-    if (!project) return;
+  // Fetch projects and persons on component mount
+  useEffect(() => {
+    async function fetchPersonsProjects() {
+      const projectsResponse = await fetch("/api/projects");
+      const projectsData = await projectsResponse.json();
+      const personsResponse = await fetch("/api/persons");
+      const personsData = await personsResponse.json();
+
+      setProjects(projectsData);
+      setPersons(personsData);
+    }
+
+    fetchPersonsProjects();
+  }, []);
+
+  async function fetchData(project: string, dateRange: string, person: string) {
+    // if (!project) return;
     setIsLoading(true);
     try {
       let url = `/api/notion?project=${project}`;
       if (dateRange) {
         url += `&dateRange=${dateRange}`;
+      }
+      if (person) {
+        url += `&person=${person}`;
       }
       const response = await fetch(url);
       const data = await response.json();
@@ -111,12 +137,18 @@ export default function Home() {
   const handleProjectChange = (value: string) => {
     console.log(value);
     setSelectedProject(value);
-    fetchData(value, selectedDateRange);
+    fetchData(value, selectedDateRange, selectedPerson);
+  };
+
+  const handlePersonChange = (value: string) => {
+    console.log(value);
+    setSelectedPerson(value);
+    fetchData(selectedProject, selectedDateRange, value);
   };
 
   const handleDateChange = (value: string) => {
     setSelectedDateRange(value);
-    fetchData(selectedProject, value);
+    fetchData(selectedProject, value, selectedPerson);
   };
 
   if (!logsData) {
@@ -125,46 +157,68 @@ export default function Home() {
 
   return (
     <main>
-      <div className="flex gap-4 flex-row items-end w-1/2">
-        <div className="basis-1/3">
+      <div className="flex gap-4 flex-row items-end">
+        <div className="basis-1/4">
           <Label htmlFor="project">Project</Label>
           <Select onValueChange={handleProjectChange}>
             <SelectTrigger id="project">
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent position="popper">
-              <SelectItem value="AIRE">AIRE</SelectItem>
-              <SelectItem value="GenA">GenA</SelectItem>
-              <SelectItem value="Growth">Growth</SelectItem>
-              <SelectItem value="Acquisitions">Acquistions</SelectItem>
+              <SelectItem value=" ">All Projects</SelectItem>
+              <Separator className="my-2" />
+              {projects.map((project) => (
+                <SelectItem key={project} value={project}>
+                  {project}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
-        <div className="basis-1/3">
+        <div className="basis-1/4">
+          <Label htmlFor="date">Person</Label>
+          <Select onValueChange={handlePersonChange}>
+            <SelectTrigger id="date">
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              <SelectItem value=" ">All Person</SelectItem>
+              <Separator className="my-2" />
+              {persons.map((person) => (
+                <SelectItem key={person} value={person}>
+                  {person}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="basis-1/4">
           <Label htmlFor="date">Date</Label>
           <Select onValueChange={handleDateChange}>
             <SelectTrigger id="date">
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent position="popper">
+              <SelectItem value=" ">All Time</SelectItem>
+              <Separator className="my-2" />
               <SelectItem value="this_week">This Week</SelectItem>
-              {/* <SelectItem value="past_week">Past Week</SelectItem> */}
               <SelectItem value="past_month">This Month</SelectItem>
               <SelectItem value="past_year">This Year</SelectItem>
             </SelectContent>
           </Select>
         </div>
+
+        <div className="basis-1/4 ml-4">
+          <Button className="btn-glow">
+            <Sparkles className="mr-2 h-4 w-4" /> Generate Summary
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-8 mt-12">
         {isLoading ? (
-          // <div className="flex gap-1.5 items-center">
-          //   <div>
-          //     <Snowflake className="animate-spin text-slate-500" size={16} />
-          //   </div>
-          //   <p className="animate-pulse mt-0">Loading...</p>
-          // </div>
           <Card>
             <CardHeader>
               <CardTitle>
@@ -173,15 +227,12 @@ export default function Home() {
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-4">
               <div className="grid grid-cols-1 text-slate-500">
-                {/* <p className="font-semibold">✅ Done this week</p> */}
                 <Skeleton className="mt-2 h-4 w-[250px]"></Skeleton>
               </div>
               <div className="grid grid-cols-1 text-slate-500">
-                {/* <p className="font-semibold">📤 Todo next week</p> */}
                 <Skeleton className="mt-2 h-4 w-[250px]"></Skeleton>
               </div>
               <div className="grid grid-cols-1 text-slate-500">
-                {/* <p className="font-semibold">💥 Blockers</p> */}
                 <Skeleton className="mt-2 h-4 w-[250px]"></Skeleton>
               </div>
             </CardContent>
@@ -189,14 +240,12 @@ export default function Home() {
               <Skeleton className="mt-2 h-4 w-[250px]"></Skeleton>
             </CardFooter>
           </Card>
-        ) : selectedProject === "" ? (
-          <p>Please select a project to view worklogs.</p>
         ) : logsData.length === 0 ? (
           <Alert>
-            <Snowflake className="text-slate-500" size={16} />
+            <Snowflake className="text-slate-500 animate-pulse" size={16} />
             <AlertTitle>No worklogs!</AlertTitle>
             <AlertDescription>
-              No worklogs found for the selected project and time.
+              No worklogs found for the selected project, time and person.
             </AlertDescription>
           </Alert>
         ) : (
@@ -204,11 +253,6 @@ export default function Home() {
             <Card key={item.id}>
               <CardHeader>
                 <CardTitle>{item.properties["Person"].select.name}</CardTitle>
-                {/* <CardDescription>
-                  <div>
-                  <Badge>{item.properties["Project"].select.name}</Badge>
-                </div>
-                </CardDescription> */}
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-4">
                 <div className="grid grid-cols-1 text-slate-500">

@@ -64,6 +64,28 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+
+  .btn-glow {
+    position: relative;
+  }
+
+  .btn-glow::before {
+    content: "";
+    position: absolute;
+    inset: -0.25px; /* spread control */
+    transform: translate(0px, 1px); /* offset control*/
+    z-index: -1;
+    background: conic-gradient(
+      from 230.29deg at 51.63% 52.16%,
+      rgb(36, 0, 255) 0deg,
+      rgb(0, 135, 255) 67.5deg,
+      rgb(108, 39, 157) 198.75deg,
+      rgb(24, 38, 163) 251.25deg,
+      rgb(54, 103, 196) 301.88deg,
+      rgb(105, 30, 255) 360deg
+    );
+    filter: blur(8px); /* control the blur */
+  }
 }
 
 @layer base {
