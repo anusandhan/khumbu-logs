@@ -32,8 +32,9 @@ async function getPersons() {
       }
     }
   });
+  const sortedPersons = Array.from(persons).sort();
 
-  return Array.from(persons);
+  return sortedPersons;
 }
 
 export async function GET(request: Request) {

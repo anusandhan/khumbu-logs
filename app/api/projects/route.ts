@@ -33,7 +33,9 @@ async function getProjects() {
     }
   });
 
-  return Array.from(projects);
+  const sortedProjects = Array.from(projects).sort();
+
+  return sortedProjects;
 }
 
 export async function GET(request: Request) {

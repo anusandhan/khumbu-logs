@@ -28,6 +28,8 @@ import {
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { Separator } from "@/components/ui/separator";
@@ -167,29 +169,34 @@ export default function Home() {
             <SelectContent position="popper">
               <SelectItem value=" ">All Projects</SelectItem>
               <Separator className="my-2" />
-              {projects.map((project) => (
-                <SelectItem key={project} value={project}>
-                  {project}
-                </SelectItem>
-              ))}
+              <ScrollArea className="h-32">
+                {projects.map((project) => (
+                  <SelectItem key={project} value={project}>
+                    {project}
+                  </SelectItem>
+                ))}
+              </ScrollArea>
             </SelectContent>
           </Select>
         </div>
 
         <div className="basis-1/4">
-          <Label htmlFor="date">Person</Label>
+          <Label htmlFor="person">Person</Label>
           <Select onValueChange={handlePersonChange}>
-            <SelectTrigger id="date">
+            <SelectTrigger id="person">
               <SelectValue placeholder="Select" />
             </SelectTrigger>
+
             <SelectContent position="popper">
-              <SelectItem value=" ">All Person</SelectItem>
+              <SelectItem value=" ">Everyone</SelectItem>
               <Separator className="my-2" />
-              {persons.map((person) => (
-                <SelectItem key={person} value={person}>
-                  {person}
-                </SelectItem>
-              ))}
+              <ScrollArea className="h-48">
+                {persons.map((person) => (
+                  <SelectItem key={person} value={person}>
+                    {person}
+                  </SelectItem>
+                ))}
+              </ScrollArea>
             </SelectContent>
           </Select>
         </div>
