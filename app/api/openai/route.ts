@@ -6,28 +6,18 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: Request, res: Response) {
-  //   console.log("Request:", req);
   const summary = await req.json();
   console.log("Data:", summary);
-  //   console.log("Request Body:", req.body);
-  //   const { summary } = req.body;
-  //   console.log("Req Summary:", summary);
 
-  //   const summaryInput = JSON.stringify(summary);
-
-  // const selectedProject = summary.summary.selectedProject;
-
-  const prompt =
-    "Summarize this logs data, be concise & use simple words. Log data:";
-  const gptInput = prompt.concat(JSON.stringify(summary.summary));
+  const prompt1 =
+    "I have a set of worklog entries that I need summarized. Each entry includes details about the project, person, date, tasks completed, upcoming tasks, and any blockers. The log data is formatted in JSON as follows:";
+  const prompt2 =
+    "Based on this data, please generate a summary that is organized by project and person. For each project and person, include the following sections:  Project Name: Display the project name. Person Name: Display the name of the person who logged the entries. Tasks Completed This Week: Summarize the tasks that were done this week, combining similar tasks across different days. Tasks Planned for Next Week: Summarize the planned tasks for next week, highlighting any repeated or ongoing tasks. Blockers: List any mentioned blockers, noting if they are recurring issues. Ensure that the summary is clear, concise, and well-formatted for easy understanding. Thank you!";
+  const gptInput = prompt1
+    .concat(JSON.stringify(summary.summary))
+    .concat(prompt2);
 
   console.log(gptInput);
-
-  //   return new Response(JSON.stringify(gptInput), {
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
 
   const completion = await openai.chat.completions.create({
     messages: [
@@ -36,7 +26,7 @@ export async function POST(req: Request, res: Response) {
         content: gptInput,
       },
     ],
-    model: "gpt-3.5-turbo",
+    model: "gpt-4",
   });
 
   console.log(completion.choices[0].message.content);

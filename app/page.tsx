@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
+import ReactMarkdown from "react-markdown";
+
 import {
   Select,
   SelectContent,
@@ -97,6 +99,8 @@ export default function Home() {
   const [projects, setProjects] = useState([]);
   const [persons, setPersons] = useState([]);
 
+  const [gptOutput, setGptOutput] = useState<string>("");
+
   useEffect(() => {
     console.log("Current logsData:", logsData);
   }, [logsData]);
@@ -154,6 +158,7 @@ export default function Home() {
   };
 
   const handleGenerateSummary = async () => {
+    setGptOutput("Formatting logs");
     const sortedLogs = [...logsData].sort((a, b) => {
       const dateA = new Date(a.properties["Log Date"].date.start);
       const dateB = new Date(b.properties["Log Date"].date.start);
@@ -185,6 +190,8 @@ export default function Home() {
 
     console.log(summary);
 
+    setGptOutput("Calling GPT");
+
     try {
       const response = await fetch("/api/openai", {
         method: "POST",
@@ -200,6 +207,7 @@ export default function Home() {
 
       const data = await response.json();
       console.log(data); // Handle the response from OpenAI
+      setGptOutput(data.message.content);
     } catch (error) {
       console.error("Error fetching summary:", error);
     }
@@ -275,6 +283,9 @@ export default function Home() {
           </Button>
         </div>
       </div>
+
+      {/* <p className="mt-12">{gptOutput}</p> */}
+      <ReactMarkdown className="mt-1 prose">{gptOutput}</ReactMarkdown>
 
       <div className="grid grid-cols-3 gap-8 mt-12">
         {isLoading ? (
