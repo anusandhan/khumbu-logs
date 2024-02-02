@@ -101,6 +101,9 @@ export default function Home() {
 
   const [gptOutput, setGptOutput] = useState<string>("");
 
+  const sampleGptOutput: string =
+    "### Project Name: Growth  #### Task Completed This Week:  - Finalized UI mockups for the homepage redesign. - Attended client feedback session on app interface. - Updated brand style guide with new color palettes. - Executed test cases for the new checkout process twice. - Logged bugs related to the user registration flow twice. - Conducted cross-browser testing for the main website twice.  #### Tasks Planned for Next Week:  - Start wireframing for the new user dashboard. - Collaborate with marketing for the upcoming product launch visuals. - Review and revise the mobile app design based on recent feedback. - Prepare test plans for the upcoming release, anticipated twice. - Perform regression testing on the fixed bugs, anticipated twice. - Coordinate with developers for bug verification, anticipated twice.  #### Blockers:  - Awaiting client approval on the homepage redesign. - Delays in bug fixes are impacting test schedules (mentioned twice).";
+
   useEffect(() => {
     console.log("Current logsData:", logsData);
   }, [logsData]);
@@ -284,8 +287,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* <p className="mt-12">{gptOutput}</p> */}
-      <ReactMarkdown className="mt-1 prose">{gptOutput}</ReactMarkdown>
+      <ReactMarkdown className="mt-12 prose">{gptOutput}</ReactMarkdown>
 
       <div className="grid grid-cols-3 gap-8 mt-12">
         {isLoading ? (
