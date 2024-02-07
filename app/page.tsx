@@ -1,4 +1,7 @@
 "use client";
+
+import dynamic from "next/dynamic";
+
 import React, { useEffect, useState } from "react";
 
 import ReactMarkdown from "react-markdown";
@@ -51,6 +54,14 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 import { Snowflake, Sparkles, RefreshCw, Loader2 } from "lucide-react";
+
+import { useGlobalAudioPlayer } from "react-use-audio-player";
+
+const Lottie = dynamic(() => import("lottie-react"), {
+  ssr: false, // This line disables server-side rendering
+});
+
+import documentAnimation from "@/public/animations/document.json";
 
 interface LogItem {
   id: string;
@@ -108,6 +119,8 @@ export default function Home() {
 
   const [projects, setProjects] = useState([]);
   const [persons, setPersons] = useState([]);
+
+  const { load } = useGlobalAudioPlayer();
 
   const [gptOutput, setGptOutput] = useState<string>("");
 
@@ -177,6 +190,7 @@ export default function Home() {
       console.error("Error fetching data:", error);
     }
     setIsLoading(false);
+    playClickSound();
   }
 
   const handleProjectChange = (value: string) => {
@@ -216,6 +230,8 @@ export default function Home() {
       selectedDateRange,
       logs: sortedLogs.map((log) => ({
         date: log.properties["Log Date"].date.start,
+        project: log.properties["Project"].select.name,
+        person: log.properties["Person"].select.name,
         doneThisWeek: log.properties["Done This Week"].rich_text
           .map((text) => text.plain_text)
           .join(" "),
@@ -230,7 +246,7 @@ export default function Home() {
 
     console.log(summary);
 
-    setGptOutput("Calling GPT");
+    setGptOutput("");
 
     try {
       const response = await fetch("/api/openai", {
@@ -252,6 +268,31 @@ export default function Home() {
       console.error("Error fetching summary:", error);
     }
     setIsGptProcessing(false);
+    playSuccessSound();
+  };
+
+  const playSelectSound = () => {
+    load("/sounds/select.mp3", {
+      autoplay: true,
+    });
+  };
+
+  const playClickSound = () => {
+    load("/sounds/click.mp3", {
+      autoplay: true,
+    });
+  };
+
+  const playSuccessSound = () => {
+    load("/sounds/success.mp3", {
+      autoplay: true,
+    });
+  };
+
+  const playHoverSound = () => {
+    load("/sounds/hover.mp3", {
+      autoplay: true,
+    });
   };
 
   if (!logsData) {
@@ -260,6 +301,7 @@ export default function Home() {
 
   return (
     <main>
+      <audio src="/sounds/click.mp3"></audio>
       <div className="flex gap-4 flex-row items-end">
         <div className="basis-1/4">
           <Label htmlFor="project">Project</Label>
@@ -268,11 +310,17 @@ export default function Home() {
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent position="popper">
-              <SelectItem value=" ">All Projects</SelectItem>
+              <SelectItem value=" " onMouseEnter={playSelectSound}>
+                All Projects
+              </SelectItem>
               <Separator className="my-2" />
               <ScrollArea className="h-32">
                 {projects.map((project) => (
-                  <SelectItem key={project} value={project}>
+                  <SelectItem
+                    key={project}
+                    value={project}
+                    onMouseEnter={playSelectSound}
+                  >
                     {project}
                   </SelectItem>
                 ))}
@@ -289,11 +337,17 @@ export default function Home() {
             </SelectTrigger>
 
             <SelectContent position="popper">
-              <SelectItem value=" ">Everyone</SelectItem>
+              <SelectItem value=" " onMouseEnter={playSelectSound}>
+                Everyone
+              </SelectItem>
               <Separator className="my-2" />
               <ScrollArea className="h-48">
                 {persons.map((person) => (
-                  <SelectItem key={person} value={person}>
+                  <SelectItem
+                    key={person}
+                    value={person}
+                    onMouseEnter={playSelectSound}
+                  >
                     {person}
                   </SelectItem>
                 ))}
@@ -309,20 +363,38 @@ export default function Home() {
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent position="popper">
-              <SelectItem value=" ">All Time</SelectItem>
+              <SelectItem value=" " onMouseEnter={playSelectSound}>
+                All Time
+              </SelectItem>
               <Separator className="my-2" />
-              <SelectItem value="this_week">This Week</SelectItem>
-              <SelectItem value="past_month">This Month</SelectItem>
-              <SelectItem value="past_year">This Year</SelectItem>
+              <SelectItem value="this_week" onMouseEnter={playSelectSound}>
+                This Week
+              </SelectItem>
+              <SelectItem value="past_month" onMouseEnter={playSelectSound}>
+                This Month
+              </SelectItem>
+              <SelectItem value="past_year" onMouseEnter={playSelectSound}>
+                This Year
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
+
+        {/* <div className="grid place-content-center bg-slate-100 h-48 w-48">
+          <div className="h-16 w-16">
+            <Lottie animationData={documentAnimation} loop={true} />
+          </div>
+        </div> */}
 
         <div className="basis-1/4 ml-4">
           {logsData.length > 0 ? (
             <Dialog>
               <DialogTrigger asChild>
-                <Button onClick={handleGenerateSummary} className="btn-glow">
+                <Button
+                  onClick={handleGenerateSummary}
+                  onMouseEnter={playHoverSound}
+                  className="btn-glow"
+                >
                   <Sparkles className="mr-2 h-4 w-4" /> Generate Summary
                 </Button>
               </DialogTrigger>
@@ -337,6 +409,18 @@ export default function Home() {
                 <div className="grid gap-4 py-4">
                   <ScrollArea className="h-[60vh] w-full">
                     <ReactMarkdown className="prose">{gptOutput}</ReactMarkdown>
+                    {isGptProcessing ? (
+                      <div className="grid place-content-center h-full w-full">
+                        <div className="h-16 w-16">
+                          <Lottie
+                            animationData={documentAnimation}
+                            loop={true}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                   </ScrollArea>
                 </div>
                 <DialogFooter>
