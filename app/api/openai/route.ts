@@ -28,7 +28,10 @@ Please ensure that the summary is clear, concise, and well-formatted.`;
 
   let dynamicPrompt = "";
 
-  if (summary.selectedProject && !summary.selectedPerson) {
+  if (
+    (summary.selectedProject && !summary.selectedPerson) ||
+    summary.selectedPerson === " "
+  ) {
     dynamicPrompt += `
     ### Project Name:
     - Summary in bullet points grouped by dates in weeks
@@ -37,8 +40,14 @@ Please ensure that the summary is clear, concise, and well-formatted.`;
     - Summary
     
     **Feb 12-15**
-    - Summary\n\n`;
-  } else if (!summary.selectedProject && summary.selectedPerson) {
+    - Summary
+    
+    Combine everyone persons' updates
+    \n\n`;
+  } else if (
+    (!summary.selectedProject && summary.selectedPerson) ||
+    summary.selectedProject === " "
+  ) {
     dynamicPrompt += `
     ### Person Name:
     - Summary in bullet points grouped by projects
