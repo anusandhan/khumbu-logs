@@ -53,7 +53,13 @@ import { Label } from "@/components/ui/label";
 
 import { Button } from "@/components/ui/button";
 
-import { Snowflake, Sparkles, RefreshCw, Loader2 } from "lucide-react";
+import {
+  Snowflake,
+  Sparkles,
+  RefreshCw,
+  Loader2,
+  Hourglass,
+} from "lucide-react";
 
 import { useGlobalAudioPlayer } from "react-use-audio-player";
 
