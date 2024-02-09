@@ -386,12 +386,6 @@ export default function Home() {
           </Select>
         </div>
 
-        {/* <div className="grid place-content-center bg-slate-100 h-48 w-48">
-          <div className="h-16 w-16">
-            <Lottie animationData={documentAnimation} loop={true} />
-          </div>
-        </div> */}
-
         <div className="basis-1/4 ml-4">
           {logsData.length > 0 ? (
             <Dialog>
@@ -413,11 +407,11 @@ export default function Home() {
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
-                  <ScrollArea className="h-[60vh] w-full">
+                  <ScrollArea className="h-[60vh] w-full grid place-content-center">
                     <ReactMarkdown className="prose">{gptOutput}</ReactMarkdown>
                     {isGptProcessing ? (
                       <div className="grid place-content-center h-full w-full">
-                        <div className="h-16 w-16">
+                        <div className="h-16 w-16 ">
                           <Lottie
                             animationData={documentAnimation}
                             loop={true}
