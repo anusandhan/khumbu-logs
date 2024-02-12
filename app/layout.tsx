@@ -18,18 +18,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <nav className="grid grid-cols-1 space-2">
-          <div className="flex items-center gap-1.5">
-            <div className="flex w-6 h-6 p-1 bg-slate-200 rounded justify-center items-center">
-              <MountainSnow size={16} />
+        <div className="px-4 overflow-x-hidden">
+          <nav className="grid grid-cols-1 space-2">
+            <div className="flex items-center gap-1.5">
+              <div className="flex w-6 h-6 p-1 bg-slate-200 rounded justify-center items-center">
+                <MountainSnow size={16} />
+              </div>
+              <h4>Khumbu</h4>
             </div>
-            <h4>Khumbu</h4>
-          </div>
-          <p className="text-slate-600">
-            Select a project or an individual to see the worklogs & summary
-          </p>
-        </nav>
-        {children}
+            <p className="text-slate-600">
+              Select a project or an individual to see the worklogs & summary
+            </p>
+          </nav>
+          {children}
+        </div>
       </body>
     </html>
   );
